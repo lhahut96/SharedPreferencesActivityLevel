@@ -1,10 +1,15 @@
 package com.example.sharedpreferencesactivitylevel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -15,6 +20,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private EditText etName, etMajor, etId;
+    private Switch pageColorSwitch;
+    private LinearLayout pageLayout;
     private TextView txvName, txvMajor, txvId;
 
     @Override
@@ -35,10 +42,29 @@ public class MainActivity extends AppCompatActivity {
         txvName = findViewById(R.id.txvName);
         txvMajor = findViewById(R.id.txvMajor);
         txvId = findViewById(R.id.txvId);
+
+        pageLayout = findViewById(R.id.pageLayout);
+
+        pageColorSwitch = findViewById(R.id.pageColorSwitch);
+        pageColorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setPageColor(isChecked);
+            }
+        });
+    }
+
+    private void setPageColor(boolean isChecked) {
+        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("yellow", isChecked);
+        editor.apply();
+
+        pageLayout.setBackgroundColor(isChecked ? Color.YELLOW : Color.WHITE);
     }
 
     public void saveData(View view) {
-        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("my_pref_file",Context.MODE_PRIVATE);
         SharedPreferences.Editor  editor = sharedPreferences.edit();
 
         // save the data as key value pairs
@@ -50,8 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadData(View view) {
-        SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-
+        SharedPreferences sharedPreferences = getSharedPreferences("my_pref_file",Context.MODE_PRIVATE);
         String name = sharedPreferences.getString("name","Name is not available!");
         String major = sharedPreferences.getString("major","Major is not available!");
         String Id = sharedPreferences.getString("Id","Student ID is not available!");
@@ -59,5 +84,10 @@ public class MainActivity extends AppCompatActivity {
         txvName.setText(name);
         txvMajor.setText(major);
         txvId.setText(Id);
+    }
+
+    public void openSecondActivity(View view) {
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
     }
 }
